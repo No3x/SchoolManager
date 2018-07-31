@@ -1,0 +1,16 @@
+#sidebar  {
+	-fx-background-color: #bbbbff;
+	
+}
+
+
+#sidebaritem {	
+	-fx-background-color: #bbbbff;
+	-fx-min-width: 400px;
+	-fx-min-height: 60px;
+	-fx-font-size: 2.5em;
+	-fx-float: left;
+	-fx-padding: 0 0 0 50;
+	-fx-text-fill: black;
+}
+
