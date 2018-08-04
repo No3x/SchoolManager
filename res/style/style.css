@@ -16,12 +16,13 @@
 	-fx-float: left;
 	-fx-padding: 0 0 0 50;
 	-fx-text-fill: black;
+	-fx-cursor: hand;
 }
 
 #scheduletitlebartitle {
 	-fx-font-size: 4em;
 	-fx-float: left;
-	-fx-padding: 10 50 20 70;
+	-fx-padding: 10 50 20 50;
 	-fx-text-fill: black;	
 	
 }
@@ -29,17 +30,27 @@
 #scheduletitlebaraddbutton {
 		-fx-min-height: 50;
 		-fx-font-weight: 900;
-		-fx-min-width: 100;
 		-fx-background-color: blue;
 		-fx-text-fill: white;
 		-fx-font-size: 2em;
-		 -fx-background-radius: 100, 100;
-		-fx-background-insets: -1.4, 0;
-		-fx-border-radius: 30;
-		-fx-border-width: 5;
-		-fx-border-color: blue;
+		-fx-cursor: hand;
+		-fx-padding: 10px;
+		-fx-background-radius: 20;
+		
 		
 }
+
+#combschedules {
+	-fx-min-height: 50;
+	-fx-max-width: infinity;
+	-fx-font-size: 2em;
+	-fx-border-color: black;
+	-fx-background-color: white;
+	-fx-border-width: 2px;
+}
+
+
+
 
 
 

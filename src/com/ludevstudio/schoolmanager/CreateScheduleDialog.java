@@ -5,6 +5,8 @@ import java.util.ResourceBundle;
 import org.controlsfx.control.ToggleSwitch;
 
 import impl.org.controlsfx.skin.ToggleSwitchSkin;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -18,9 +20,16 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-public class CreateScheduleDialog extends Stage{
+public class CreateScheduleDialog extends Stage implements EventHandler<ActionEvent> {
 	ResourceBundle bundle;
 	GridPane content;
+	
+	Button btnOk;
+	TextField tfName;
+	TextField tfComment;
+	ComboBox combLessons;
+	ToggleSwitch switch0Houer;
+	ToggleSwitch switchWeekend;
 	
 	public CreateScheduleDialog() {
 		bundle = ResourceBundle.getBundle("Bundle"); // Get the Bundle for multipe lang strings
@@ -45,12 +54,12 @@ public class CreateScheduleDialog extends Stage{
 		
 		
 		
-		TextField tfName = new TextField(bundle.getString("DialogAddSchedule.TfHints.Name"));
+		tfName = new TextField(bundle.getString("DialogAddSchedule.TfHints.Name"));
 		tfName.setId("name");
 		GridPane.setFillWidth(tfName, true);
 		content.add(tfName, 0, 0, 2, 1);
 		
-		TextField tfComment = new TextField(bundle.getString("DialogAddSchedule.TfHints.Comment"));
+		tfComment = new TextField(bundle.getString("DialogAddSchedule.TfHints.Comment"));
 		tfComment.setId("comment");
 		GridPane.setMargin(tfComment, new Insets(10, 0 , 0, 0));
 		content.add(tfComment, 0, 1, 2, 1);
@@ -61,7 +70,7 @@ public class CreateScheduleDialog extends Stage{
 		content.add(labLessons, 0, 3);
 		
 		int[] combLessonsArray = new int[] {4,5,6,7,8,9,10,11,12,13,14,15,16};
-		ComboBox combLessons =new ComboBox();
+		 combLessons =new ComboBox();
 			for(int i=0; i<combLessonsArray.length; i++) combLessons.getItems().add(combLessonsArray[i]);
 		combLessons.setId("comblessons");
 		combLessons.setValue(8);
@@ -73,7 +82,7 @@ public class CreateScheduleDialog extends Stage{
 		GridPane.setMargin(lab0Houer, new Insets(0, 0, 0, 0));
 		content.add(lab0Houer, 0, 4);
 		
-		ToggleSwitch switch0Houer = new ToggleSwitch();
+		switch0Houer = new ToggleSwitch();
 		GridPane.setMargin(switch0Houer, new Insets(0, 0, 0, 50));
 		switch0Houer.setScaleX(1.1);
 		switch0Houer.setScaleY(1.1);
@@ -87,7 +96,7 @@ public class CreateScheduleDialog extends Stage{
 		GridPane.setMargin(labWeekend, new Insets(0, 0, 0, 0));
 		content.add(labWeekend, 0, 5);
 		
-		ToggleSwitch switchWeekend = new ToggleSwitch();
+		switchWeekend = new ToggleSwitch();
 		GridPane.setMargin(switchWeekend, new Insets(0, 0, 0, 50));
 		switchWeekend.setId("switchweekend");
 		switchWeekend.setScaleX(1.1);
@@ -95,19 +104,35 @@ public class CreateScheduleDialog extends Stage{
 		content.add(switchWeekend, 1, 5);
 		
 		
-		Button btnOk = new Button(bundle.getString("DialogAddSchedule.Buttons.Ok"));
+		 btnOk = new Button(bundle.getString("DialogAddSchedule.Buttons.Ok"));
 		btnOk.setId("button");
+		btnOk.setOnAction(this);
 		GridPane.setMargin(btnOk, new Insets(20, 0, 0, 0));
 		GridPane.setFillWidth(btnOk, true);
 		content.add(btnOk, 0, 6, 2, 1);
-		
-	/*	Button btnCancel = new Button(bundle.getString("DialogAddSchedule.Buttons.Cancel"));
-		btnCancel.setId("button");
-		GridPane.setMargin(btnCancel, new Insets(20, 0, 0, 0));
-		GridPane.setFillWidth(btnCancel, true);
-		content.add(btnCancel, 1, 6);
-		
-		*/
+	
 		
 	}
+
+	@Override
+	public void handle(ActionEvent event) {
+		if(event.getSource()==btnOk) {
+			String name = tfName.getText();
+			String comment = tfComment.getText();
+			int houers = (int) combLessons.getValue();
+			boolean zeroHouer = switch0Houer.isSelected();
+			boolean weekend = switchWeekend.isSelected();
+			
+			DataBaseControler controler = new DataBaseControler();
+			controler.createNewSchedule(name, comment, houers, zeroHouer, weekend);
+		
+			this.close();
+		}
+	}	
+	
+	
+	
+	
+	
+	
 }

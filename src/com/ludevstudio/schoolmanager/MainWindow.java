@@ -38,7 +38,7 @@ public class MainWindow extends Application implements EventHandler<ActionEvent>
 		root = new BorderPane();
 		Scene mainScene = new Scene(root);
 		stage.initStyle(StageStyle.DECORATED);
-		initComponents();
+		
 		
 		
 		
@@ -53,6 +53,7 @@ public class MainWindow extends Application implements EventHandler<ActionEvent>
 		stage.setMinHeight(800);
 		stage.setMinWidth(1200);
 		
+		initComponents();
 		stage.show();
 	}
 	
@@ -60,9 +61,8 @@ public class MainWindow extends Application implements EventHandler<ActionEvent>
 		
 		
 		initSideBar();
-		
-		
 		root.setLeft(sideBar);
+		
 		root.setCenter(new SchedulePage());
 		
 	}
