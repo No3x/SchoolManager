@@ -32,10 +32,14 @@ import javafx.scene.text.TextAlignment;
 public final class Schedule extends GridPane  {
 	ResourceBundle bundle;
 	
-	int days;
-		int houers;
+	 String NAME;
 	
-	public Schedule(int houers, boolean weekend) {
+	int days;
+	int houers;
+	
+		boolean zeroLesson;
+	
+	public Schedule(String name, int houers, boolean zeroLesson, boolean weekend) {
 		setAlignment(Pos.CENTER);
 		setStyle("-fx-background-color: white;");
 		setGridLinesVisible(true);
@@ -43,22 +47,30 @@ public final class Schedule extends GridPane  {
 		
 		bundle = ResourceBundle.getBundle("Bundle");
 		
+		this.NAME = name;
 		if(weekend) {
 			this.days = 7;
 		} else {
 			this.days = 5;
 		}
 		this.houers = houers;
-
+		this.zeroLesson = zeroLesson;
 		
+		System.out.println(zeroLesson);
 		
 		createHeader();
 		
-		
+		// fill complete schedule with empty cells
 		for(int i = 1; i<=days; i++) {
-		for(int j = 1; j<=houers; j++) {
-			setEmpty(i, j);
-		}	
+			if(zeroLesson) {
+				for(int j = 1; j<=houers+1; j++) {
+					setEmpty(i, j);
+				}	
+ 			} else  {
+ 				for(int j = 1; j<=houers; j++) {
+ 					setEmpty(i, j);
+ 				}	
+ 			}
 		}
 	
 		
@@ -119,7 +131,7 @@ public final class Schedule extends GridPane  {
 	
 	public HBox houerCell(int houer) {
 		HBox cell =new HBox();
-		Label labHouer = new Label(houer + "");
+		Label labHouer = new Label(houer+"");
 		labHouer.setStyle("-fx-text-alignment: left; -fx-background-color: #00f; -fx-text-fill: #fff; -fx-font-weight: 700; -fx-padding: 7 0 7 4; -fx-font-size: 2em; -fx-max-width: infinity; -fx-max-height: infinity");
 		labHouer.setAlignment(Pos.BASELINE_LEFT);
 		GridPane.setHgrow(labHouer, Priority.ALWAYS);
@@ -153,10 +165,21 @@ public final class Schedule extends GridPane  {
 		for(int i=0; i<days; i++) {
 			add(dayCell(i), (i+1), 0);
 		}
-		for(int i=0; i<houers; i++) {
-			add(houerCell(i+1), (0), (i+1));
+		
+		if(zeroLesson) {
+			for(int i=0; i<=houers; i++) {
+				add(houerCell(i), 0, (i+1));
+				
+			}
+			
+		} else {
+			for(int i=0; i<houers; i++) {
+				add(houerCell(i+1), 0, (i+1));
+			}
 		}
+		
 	}
+	
 	
 	
 	public void setLesson(int day, int houer, String subject, String teacher, String room, String color) {
@@ -189,9 +212,9 @@ public final class Schedule extends GridPane  {
 		cell.getChildren().add(labRoom);
 		
 		
-		
-		
 		add(cell, day, houer);
+		saveLesson(labName.getText(), GridPane.getColumnIndex(cell).toString(), GridPane.getRowIndex(cell).toString());
+		
 		
 	}
 
@@ -202,33 +225,52 @@ public final class Schedule extends GridPane  {
 		cell.setMaxWidth(Double.MAX_VALUE);
 		
 		cell.setOnMouseClicked((MouseEvent t) -> {
-	       
-		setLesson(GridPane.getColumnIndex(cell), GridPane.getRowIndex(cell), "Geschichte", "Frau König", "119", "#198974");
-		
-		
+			setLesson(GridPane.getColumnIndex(cell), GridPane.getRowIndex(cell), "Geschichte", "Frau König", "119", "#198974");
 		});
 		
 		add(cell, day, houer);
-		
 		
 		
 	}
 	
 	private void load() {
 		DataBaseControler controler =new DataBaseControler();
-		ArrayList<String[]> subjects = controler.loadScheduleSubjects("test");
+		ArrayList<String[]> subjects = controler.loadScheduleSubjects(NAME);
 		
 		for(int i=0; i<subjects.size(); i++) {
 			for(int j=0; j<days; j++) {
-				ArrayList<String> subject = controler.loadSubject(subjects.get(i)[j]);
-				if(subjects.get(i)[j]!=null && subject.size()!=0) {
-					setLesson(j+1, i+1, subject.get(0), subject.get(1), subject.get(2), subject.get(3));
+				if(zeroLesson) {
+					ArrayList<String> subject = controler.loadSubject(subjects.get(i)[j]);
+					if(subjects.get(i)[j]!=null && subject.size()!=0) {
+						setLesson(j+1, i+1, subject.get(0), subject.get(1), subject.get(2), subject.get(3));
+					} else {
+						setEmpty(j+1, i+1);
+					}
+				
 				} else {
-					setEmpty(j+1, i+1);
+					if(i==0) { continue; }
+					ArrayList<String> subject = controler.loadSubject(subjects.get(i)[j]);
+					if(subjects.get(i)[j]!=null && subject.size()!=0) {
+						setLesson(j+1, i, subject.get(0), subject.get(1), subject.get(2), subject.get(3));
+					} else {
+						setEmpty(j+1, i+1);
+					}
 				}
 			}
 		}
 	
+	}
+		// Save the edited cell to database
+	public void saveLesson(String sub, String day, String lesson) {
+		DataBaseControler controller =new DataBaseControler();
+		
+		if(zeroLesson) {
+			controller.saveSchedule(NAME, sub, day, Integer.toString(Integer.parseInt(lesson)-1));
+		
+		} else {
+ 			controller.saveSchedule(NAME, sub, day, lesson);
+		 		}
+ 		
 	}
 	
 }

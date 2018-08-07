@@ -1,7 +1,10 @@
 package com.ludevstudio.schoolmanager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -34,6 +37,8 @@ public class SchedulePage extends BorderPane implements EventHandler<ActionEvent
 	Button btnAdd;
 	ComboBox<String> combSchedules;
 	
+	// Schedule View
+	ScrollPane scroll;
 	
 	// Database Acces
 	DataBaseControler controler;
@@ -51,12 +56,9 @@ public class SchedulePage extends BorderPane implements EventHandler<ActionEvent
 		setTop(titlebar); // set the titlebar to top of the Borderpane
 		
 			
-		// Footer
-		initFooter();
-		setBottom(footer); 
+		
 	
-	
-	ScrollPane scroll = new ScrollPane(new Schedule(16, false));
+	scroll = new ScrollPane();
 	scroll.setStyle("-fx-background-color: white;");
 	scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
 	scroll.setVbarPolicy(ScrollBarPolicy.NEVER);
@@ -66,6 +68,10 @@ public class SchedulePage extends BorderPane implements EventHandler<ActionEvent
 	
 	setCenter(scroll);
 	
+	// Footer
+			initFooter();
+			setBottom(footer); 
+		
 }
 	
 	// init Titlebar
@@ -84,6 +90,7 @@ public class SchedulePage extends BorderPane implements EventHandler<ActionEvent
 		ObservableList<String> combItems =FXCollections.observableList(controler.getScheduleList()); // get all schedule names from database
 		 combSchedules = new ComboBox<>(combItems);
 		combSchedules.setId("combschedules");
+		combSchedules.setOnAction(this);
 		GridPane.setFillWidth(combSchedules, true);
 		GridPane.setHgrow(combSchedules, Priority.ALWAYS);
 		GridPane.setMargin(combSchedules, new Insets(0, 0, 20, 0));
@@ -92,6 +99,10 @@ public class SchedulePage extends BorderPane implements EventHandler<ActionEvent
 		// if combItems.lenght !=null
 		if(!combItems.isEmpty()) {
 			combSchedules.setValue(combItems.get(0));
+			
+			String scheduleName = combSchedules.getItems().get(0);
+			updateView(scheduleName);
+			
 		} else {
 			combSchedules.setValue(bundle.getString("MainWindow.Schedulepage.Footer.Combschedules.Noitem"));
 		}
@@ -116,8 +127,11 @@ public class SchedulePage extends BorderPane implements EventHandler<ActionEvent
 		if(event.getSource()==btnAdd) {
 			CreateScheduleDialog dialog = new CreateScheduleDialog();  // create dialog for create new schedule
 			dialog.showAndWait();	// show the dialog
-		
+			
 			updateCombSchedules();
+			updateView(combSchedules.getValue());
+		} else if (event.getSource()==combSchedules) {
+			updateView(combSchedules.getValue());
 		}
 	}
 	
@@ -129,6 +143,13 @@ public class SchedulePage extends BorderPane implements EventHandler<ActionEvent
 		if(!scheduleList.isEmpty()) {
 			combSchedules.setValue(scheduleList.get(scheduleList.size()-1));
 		}
+	}
+	
+	
+	private void updateView(String scheduleName) {
+		ArrayList<String> infos = controler.loadScheduleInfos(scheduleName);
+		scroll.setContent(new Schedule(infos.get(0), Integer.parseInt(infos.get(2)), new Boolean(Integer.parseInt(infos.get(3))!=0), new Boolean(Integer.parseInt(infos.get(4))!=0)));
+		
 	}
 	
 }

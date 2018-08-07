@@ -37,6 +37,7 @@ public class DataBaseControler {
 		}
 		
 		
+		
 	}
 	
 	public void createNewSchedule(String name, String comment, int houers, Boolean zeroHouer, Boolean weekend) {
@@ -69,6 +70,26 @@ public class DataBaseControler {
 					stat.execute("INSERT INTO "+TABLE_NAME+" ("+COL_NAME+", "+COL_COMMENT+", "+COL_HOUERS+", "+COL_ZEROHOUER+", "+COL_WEEKEND
 					+ ") VALUES('"+name+"', '"+comment+"', "+houers+", "+zeroHouerStr+", "+weekendStr+");");
 			
+					
+				// create table for the new schedule
+					name = name.replace(" ", "_");
+				
+					
+					
+					stat.executeUpdate("CREATE TABLE IF NOT EXISTS Schedule_"+name+" " +
+							"('Lesson', '1', '2', '3', '4', '5', '6', '7');");
+					
+					
+					
+					// insert lesson numbers
+					
+					
+					
+					for(int i=0; i<=houers; i++) {
+						stat.executeUpdate("INSERT INTO Schedule_"+name+" (Lesson) VALUES("+i+");");
+					}
+					
+					
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -82,10 +103,6 @@ public class DataBaseControler {
 		try {
 			Statement stat = connection.createStatement();
 			
-			
-			
-			
-			
 			ResultSet rs = stat.executeQuery("SELECT Name FROM Schedules;");
 			while(rs.next())
 				list.add(rs.getString(1));
@@ -98,18 +115,40 @@ public class DataBaseControler {
 	}
 	
 	
-	
-	public ArrayList<String[]> loadScheduleSubjects(String scheduleName) {
-		ArrayList<String[]> subjects = new ArrayList<>();
+	public ArrayList<String> loadScheduleInfos(String name) {
+		
+		final String TABLE_NAME = "Schedules";
+		ArrayList<String> infos =new ArrayList<>();
 		
 		try {
 			Statement stat = connection.createStatement();
-			stat.executeUpdate("CREATE TABLE IF NOT EXISTS Schedule_"+scheduleName+"('1', '2', '3', '4', '5', '6', '7');");
+			
+			ResultSet rs = stat.executeQuery("SELECT * FROM "+TABLE_NAME+" WHERE Name='"+name+"';");
+			while(rs.next()) {
+				for(int i=0; i<5; i++) {
+					infos.add(rs.getString(i+1));
+				}
+				
+			}
+			
+		
+		} catch (SQLException e) {
+			
+		}
+		return infos;
+	}
+	
+	public ArrayList<String[]> loadScheduleSubjects(String scheduleName) {
+		ArrayList<String[]> subjects = new ArrayList<>();
+		scheduleName = scheduleName.replace(" ", "_");
+		try {
+			Statement stat = connection.createStatement();
+			stat.executeUpdate("CREATE TABLE IF NOT EXISTS Schedule_"+scheduleName+"(Lesson, '1', '2', '3', '4', '5', '6', '7');");
 			ResultSet rs = stat.executeQuery("SELECT * FROM Schedule_"+scheduleName+";");
 			
 			
 			while(rs.next()) {
-				subjects.add(new String[] {rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5)});
+				subjects.add(new String[] {rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6)});
 			}
 		
 		} catch (SQLException e) {
@@ -147,6 +186,89 @@ public class DataBaseControler {
 		return subject;
 	}
 	
+	public Boolean isSubjectExisting(String name) {
+ArrayList<String> subject = new ArrayList<>();
+		
+		try {
+			Statement stat = connection.createStatement();
+			stat.executeUpdate("CREATE TABLE IF NOT EXISTS Subjects ('Name', 'Teacher', 'Room', 'Color');");
+			ResultSet rs = stat.executeQuery("SELECT * FROM Subjects WHERE Name = '"+name+"';");
+			
+			while(rs.next()) {
+				subject.add(rs.getString(1));
+				
+			}	
+			
+			stat.close();
+			rs.close();
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		
+		if(subject.size()>0) {
+			return true; 
+		}
+		
+		
+		return false;
+	}
+	
+	public void createNewSubject(String name, String teacher, String room, String color) {
+		final String TABLE_NAME = "Subjects";
+		final String COL_NAME = "Name";
+		final String COL_TEACHER = "Teacher";
+		final String COL_ROOM = "Room";
+		final String COL_COLOR = "Color";
+	
+			
+			try {
+				Statement stat = connection.createStatement();
+			
+			// Create subjects table if not exists
+			stat.execute("CREATE TABLE IF NOT EXISTS "+TABLE_NAME+" ("
+				+ COL_NAME +", "
+				+ COL_TEACHER+", "
+				+ COL_ROOM+", "
+				+ COL_COLOR + ");");
+			
+			
+			
+				// Insert new subject infos into table
+				
+					stat.execute("INSERT INTO "+TABLE_NAME+" ("+COL_NAME+", "+COL_TEACHER+", "+COL_ROOM+", "+COL_COLOR+" ) "
+							+ "VALUES('"+name+"', '"+teacher+"', "+color+");");
+			
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+				}
+	
+	
+	public void saveSchedule(String schedule, String sub, String day,String lesson) {
+		schedule = schedule.replace(" ", "_");
+		final String TABLE_NAME = "Schedule_"+schedule;
+		
+		
+		try {
+			
+			Statement stat = connection.createStatement();
+			stat.executeUpdate("CREATE TABLE IF NOT EXISTS "+TABLE_NAME+" ("
+					+ "'Lesson', '1', '2', '3', '4', '5', '6', '7');");
+			
+			stat.executeUpdate("UPDATE "+TABLE_NAME+" SET '"+day+"'='"+sub+"' WHERE lesson = "+lesson+";"); // HIER!!!
+				
+				
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	
 	
 }
