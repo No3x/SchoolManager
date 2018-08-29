@@ -35,7 +35,7 @@ public class CreateScheduleDialog extends Stage implements EventHandler<ActionEv
 		bundle = ResourceBundle.getBundle("Bundle"); // Get the Bundle for multipe lang strings
 		
 		initModality(Modality.APPLICATION_MODAL);
-		initOwner(MainWindow.mainWindowStage);
+		initOwner(MainWindow.getMainWindowStage());
 		initStyle(StageStyle.DECORATED);
 		setTitle(bundle.getString("DialogAddSchedule.Header.Title"));
 		setResizable(false);

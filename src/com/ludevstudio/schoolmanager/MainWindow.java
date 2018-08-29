@@ -19,7 +19,7 @@ import javafx.stage.StageStyle;
 public class MainWindow extends Application implements EventHandler<ActionEvent> {
 	ResourceBundle bundle;
 	
-	static Stage mainWindowStage;
+	private static Stage mainWindowStage;
 	
 	
 	static BorderPane root;
@@ -33,7 +33,7 @@ public class MainWindow extends Application implements EventHandler<ActionEvent>
 	@Override
 	public void start(Stage stage) throws Exception {
 		bundle = ResourceBundle.getBundle("Bundle");
-		mainWindowStage = stage;
+		setMainWindowStage(stage);
 		
 		root = new BorderPane();
 		Scene mainScene = new Scene(root);
@@ -135,6 +135,14 @@ public class MainWindow extends Application implements EventHandler<ActionEvent>
 	
 	public static void setOpacity(double opacity) {
 		root.setOpacity(opacity);
+	}
+
+	public static Stage getMainWindowStage() {
+		return mainWindowStage;
+	}
+
+	public static void setMainWindowStage(Stage mainWindowStage) {
+		MainWindow.mainWindowStage = mainWindowStage;
 	}
  	
 		

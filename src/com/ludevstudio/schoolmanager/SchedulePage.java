@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.ludevstudio.schoolmanager.Schedule.Schedule;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

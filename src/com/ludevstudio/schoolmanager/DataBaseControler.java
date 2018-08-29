@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.org.apache.bcel.internal.generic.I2D;
 import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 
@@ -115,6 +116,7 @@ public class DataBaseControler {
 	}
 	
 	
+	
 	public ArrayList<String> loadScheduleInfos(String name) {
 		
 		final String TABLE_NAME = "Schedules";
@@ -133,7 +135,7 @@ public class DataBaseControler {
 			
 		
 		} catch (SQLException e) {
-			
+			return infos;
 		}
 		return infos;
 	}
@@ -160,20 +162,77 @@ public class DataBaseControler {
 	}
 	
 	
-	public ArrayList<String> loadSubject(String name) {
+	
+	public void saveSchedule(String schedule, String ID, String day,String lesson) {
+		schedule = schedule.replace(" ", "_");
+		final String TABLE_NAME = "Schedule_"+schedule;
+		
+		
+		try {
+			
+			Statement stat = connection.createStatement();
+			stat.executeUpdate("CREATE TABLE IF NOT EXISTS "+TABLE_NAME+" ("
+					+ "'Lesson', '1', '2', '3', '4', '5', '6', '7');");
+			
+			stat.executeUpdate("UPDATE "+TABLE_NAME+" SET '"+day+"'='"+ID+"' WHERE lesson = "+lesson+";"); // HIER!!!
+				
+				
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
+	
+	public ArrayList<String> getSubjectList() {
+		ArrayList<String> subs =new ArrayList<>();
+		final String TABLE_NAME = "Subjects";
+		final String COL_ID = "ID";
+		final String COL_NAME = "Name";
+		final String COL_TEACHER = "Teacher";
+		final String COL_ROOM = "Room";
+		final String COL_COLOR = "Color";
+		
+		try {
+			Statement stat = connection.createStatement();
+			stat.executeUpdate("CREATE TABLE IF NOT EXISTS "+TABLE_NAME+"("+COL_NAME+", "+COL_NAME+", "+COL_TEACHER+", "
+					+COL_ROOM+", "+COL_COLOR + ");");
+			ResultSet rs = stat.executeQuery("SELECT "+COL_ID+" FROM "+TABLE_NAME+";");
+			
+			while(rs.next()) {
+				subs.add(rs.getString(1));
+			}
+			
+		} catch (SQLException e) {
+		return subs;
+		}
+	
+		return subs;
+	}
+	
+	
+	
+	
+	public ArrayList<String> loadSubject(String ID) {
 		ArrayList<String> subject = new ArrayList<>();
 		
 		try {
 			Statement stat = connection.createStatement();
-			stat.executeUpdate("CREATE TABLE IF NOT EXISTS Subjects ('Name', 'Teacher', 'Room', 'Color');");
-			ResultSet rs = stat.executeQuery("SELECT * FROM Subjects WHERE Name = '"+name+"';");
+			stat.executeUpdate("CREATE TABLE IF NOT EXISTS Subjects ('ID', 'Name', 'Teacher', 'Room', 'Color');");
+			ResultSet rs = stat.executeQuery("SELECT * FROM Subjects WHERE ID = '"+ID+"';");
 			
 			while(rs.next()) {
 				subject.add(rs.getString(1));
 				subject.add(rs.getString(2));
 				subject.add(rs.getString(3));
 				subject.add(rs.getString(4));
+				subject.add(rs.getString(5));
 			}	
+			
+			
 			
 			stat.close();
 			rs.close();
@@ -218,6 +277,7 @@ ArrayList<String> subject = new ArrayList<>();
 	
 	public void createNewSubject(String name, String teacher, String room, String color) {
 		final String TABLE_NAME = "Subjects";
+		final String COL_ID = "ID";
 		final String COL_NAME = "Name";
 		final String COL_TEACHER = "Teacher";
 		final String COL_ROOM = "Room";
@@ -229,17 +289,18 @@ ArrayList<String> subject = new ArrayList<>();
 			
 			// Create subjects table if not exists
 			stat.execute("CREATE TABLE IF NOT EXISTS "+TABLE_NAME+" ("
+				+ COL_ID +", "
 				+ COL_NAME +", "
 				+ COL_TEACHER+", "
 				+ COL_ROOM+", "
 				+ COL_COLOR + ");");
 			
-			
+				// Generate ID
+				final long ID = System.currentTimeMillis();
 			
 				// Insert new subject infos into table
-				
-					stat.execute("INSERT INTO "+TABLE_NAME+" ("+COL_NAME+", "+COL_TEACHER+", "+COL_ROOM+", "+COL_COLOR+" ) "
-							+ "VALUES('"+name+"', '"+teacher+"', "+color+");");
+					stat.execute("INSERT INTO "+TABLE_NAME+" ('"+COL_ID+"', '"+COL_NAME+"', '"+COL_TEACHER+"', '"+COL_ROOM+"', '"+COL_COLOR+"' ) "
+							+ "VALUES('"+ID+"', '"+name+"', '"+teacher+"', '"+room+"', '"+color+"');");
 			
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -248,26 +309,69 @@ ArrayList<String> subject = new ArrayList<>();
 				}
 	
 	
-	public void saveSchedule(String schedule, String sub, String day,String lesson) {
-		schedule = schedule.replace(" ", "_");
-		final String TABLE_NAME = "Schedule_"+schedule;
+	public String getSubjectID(String name, String teacher, String room, String color) {
+		final String TABLE_NAME = "Subjects";
+		final String COL_ID = "ID";
+		final String COL_NAME = "Name";
+		final String COL_TEACHER = "Teacher";
+		final String COL_ROOM = "Room";
+		final String COL_COLOR = "Color";
 		
+		
+		String ID = "";
 		
 		try {
-			
 			Statement stat = connection.createStatement();
-			stat.executeUpdate("CREATE TABLE IF NOT EXISTS "+TABLE_NAME+" ("
-					+ "'Lesson', '1', '2', '3', '4', '5', '6', '7');");
 			
-			stat.executeUpdate("UPDATE "+TABLE_NAME+" SET '"+day+"'='"+sub+"' WHERE lesson = "+lesson+";"); // HIER!!!
-				
-				
+			
+			ResultSet rs = stat.executeQuery("SELECT * FROM "+TABLE_NAME
+					+ " WHERE "
+					+ COL_NAME+" = '"+name+"' AND "
+					+ COL_TEACHER+" = '"+teacher+"' AND "
+					+ COL_ROOM+" = '"+room+"' AND "			
+					+ COL_COLOR+" = '"+color+"';");
+					
+		while(rs.next()) {
+			ID = rs.getString(1);
+		}
 		
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
+		
+		return ID;
+	}
+	
+	public ArrayList<String[]> loadSubjects() {
+		ArrayList<String[]> subjects = new ArrayList<>();
+		
+		try {
+			Statement stat = connection.createStatement();
+			stat.executeUpdate("CREATE TABLE IF NOT EXISTS Subjects ('ID', 'Name', 'Teacher', 'Room', 'Color');");
+			ResultSet rs = stat.executeQuery("SELECT * FROM Subjects;");
+			
+			while(rs.next()) {
+				String[] sub = new String[] {
+					rs.getString(1), rs.getString(2),
+					rs.getString(3), rs.getString(4),
+					rs.getString(5)
+				};
+				subjects.add(sub);
+			}	
+			
+			
+			
+			stat.close();
+			rs.close();
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return subjects;
 	}
 	
 	
