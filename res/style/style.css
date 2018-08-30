@@ -19,6 +19,16 @@
 	-fx-cursor: hand;
 }
 
+.sidebaritemdefault {
+	-fx-background-color: bbbbff !important;
+	-fx-text-fill: black !important;
+}
+
+.sidebaritemselected {
+	-fx-background-color: #00a !important;
+	-fx-text-fill: white !important;
+}
+
 #scheduletitlebartitle {
 	-fx-font-size: 4em;
 	-fx-float: left;

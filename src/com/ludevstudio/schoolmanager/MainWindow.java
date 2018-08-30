@@ -1,10 +1,7 @@
 package com.ludevstudio.schoolmanager;
 
-import java.util.ResourceBundle;
-
 import javafx.application.Application;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -15,6 +12,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import java.util.ResourceBundle;
 
 public class MainWindow extends Application implements EventHandler<ActionEvent> {
 	ResourceBundle bundle;
@@ -109,30 +108,27 @@ public class MainWindow extends Application implements EventHandler<ActionEvent>
 
 	@Override
 	public void handle(ActionEvent event) {
-		if(event.getSource()==sidebarItemSchedule) {
-			for(Node item : sideBarTopButtons.getChildren()) 
-				item.setStyle("-fx-background-color: bbbbff; -fx-text-fill: black;");
-			for(Node item : sideBarBottumBButtons.getChildren())	
-				item.setStyle("-fx-background-color: bbbbff; -fx-text-fill: black;");
-			sidebarItemSchedule.setStyle("-fx-background-color: #00a; -fx-text-fill: white;");
-		} else if(event.getSource()==sidebarItemHomework) {
-			for(Node item : sideBarTopButtons.getChildren()) 
-				item.setStyle("-fx-background-color: bbbbff; -fx-text-fill: black;");
-			for(Node item : sideBarBottumBButtons.getChildren())	
-				item.setStyle("-fx-background-color: bbbbff; -fx-text-fill: black;");
-			sidebarItemHomework.setStyle("-fx-background-color: #00a; -fx-text-fill: white;");
-		} else if(event.getSource()==sidebarItemMark) {
-			for(Node item : sideBarTopButtons.getChildren()) 
-				item.setStyle("-fx-background-color: bbbbff; -fx-text-fill: black;");
-			for(Node item : sideBarBottumBButtons.getChildren())	
-				item.setStyle("-fx-background-color: bbbbff; -fx-text-fill: black;");
-			sidebarItemMark.setStyle("-fx-background-color: #00a; -fx-text-fill: white;");
-		}
-	
+		final Object selected = event.getSource();
+		setSelectedNodeInNodes(selected, sideBarTopButtons.getChildren());
+		setSelectedNodeInNodes(selected, sideBarBottumBButtons.getChildren());
 	}
 
-	
-	
+	private void setSelectedNodeInNodes(Object selected, Iterable<Node> nodes) {
+		final String selectedClass = "sidebaritemselected";
+		final String defaultClass = "sidebaritemdefault";
+
+		for(Node item : nodes) {
+			item.getStyleClass().remove(selectedClass);
+			item.getStyleClass().remove(defaultClass);
+			if(selected==item) {
+				item.getStyleClass().add(selectedClass);
+			} else {
+				item.getStyleClass().add(defaultClass);
+			}
+		}
+	}
+
+
 	public static void setOpacity(double opacity) {
 		root.setOpacity(opacity);
 	}
