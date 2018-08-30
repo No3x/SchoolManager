@@ -198,8 +198,8 @@ public class DataBaseControler {
 		
 		try {
 			Statement stat = connection.createStatement();
-			stat.executeUpdate("CREATE TABLE IF NOT EXISTS "+TABLE_NAME+"("+COL_NAME+", "+COL_NAME+", "+COL_TEACHER+", "
-					+COL_ROOM+", "+COL_COLOR + ");");
+			stat.executeUpdate("CREATE TABLE IF NOT EXISTS "+TABLE_NAME+"(" + COL_ID + " integer,"+COL_NAME+" TEXT, "+COL_TEACHER+" TEXT, "
+					+COL_ROOM+" TEXT, "+COL_COLOR + " TEXT);");
 			ResultSet rs = stat.executeQuery("SELECT "+COL_ID+" FROM "+TABLE_NAME+";");
 			
 			while(rs.next()) {
