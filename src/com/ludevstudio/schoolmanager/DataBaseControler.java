@@ -207,6 +207,7 @@ public class DataBaseControler {
 			}
 			
 		} catch (SQLException e) {
+			e.printStackTrace();
 		return subs;
 		}
 	
