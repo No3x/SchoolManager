@@ -78,7 +78,7 @@ public class DataBaseControler {
 					
 					
 					stat.executeUpdate("CREATE TABLE IF NOT EXISTS Schedule_"+name+" " +
-							"('Lesson', '1', '2', '3', '4', '5', '6', '7');");
+							"('Lesson' integer, '1' integer, '2' integer, '3' integer, '4' integer, '5' integer, '6' integer, '7' integer);");
 					
 					
 					
